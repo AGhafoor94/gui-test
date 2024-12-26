@@ -1,0 +1,61 @@
+#include <Windows.h>
+#include <stdio.h>
+
+LRESULT CALLBACK WndProc(HWND handleWindow, UINT message, WPARAM wParam, LPARAM lParam);
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE previousInstance, LPWSTR lpCommandLine, int nCommandShow) {
+    // cl windows.c user32.lib
+    WNDCLASSEXW windowClass = {0};
+    windowClass.cbSize = sizeof(WNDCLASSEXW);
+    windowClass.style =  CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
+    windowClass.lpfnWndProc = WndProc;
+    windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+    windowClass.lpszMenuName = L"Hi";
+    windowClass.lpszClassName = L"Window";
+    windowClass.hIconSm = NULL;
+    windowClass.hInstance = hInstance;
+    windowClass.hIcon = NULL;
+    windowClass.cbClsExtra = 0;
+    windowClass.cbWndExtra = 0;
+
+    // HWND handleWindow = CreateWindowEXW(NULL, L"TEST",L"Window",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT, 0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
+    HWND handleWindow = CreateWindowW(L"TEST",L"Window",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+    
+
+    ShowWindow(handleWindow, nCommandShow);
+    UpdateWindow(handleWindow);
+    MSG message = {0};
+
+    while(GetMessage(&message, NULL, 0, 0)){
+        TranslateMessage(&message);
+        DispatchMessage(&message);
+    }
+
+    return 0;
+}
+LRESULT CALLBACK WndProc(HWND handleWindow, UINT message, WPARAM wParam, LPARAM lParam){
+    switch(message){
+        case WM_COMMAND:
+            {
+                printf("ACTIVE APP");
+            }
+            break;
+        case WM_PAINT:
+            {
+                PAINTSTRUCT paintStruct = {0};
+                HDC handleDCBeginPaint = BeginPaint(handleWindow,&paintStruct);
+                EndPaint(handleWindow, &paintStruct);
+                // return 0;
+            }
+            break;
+        case WM_DESTROY:
+            {
+                PostQuitMessage(0);
+            }
+            break;
+        default:
+            return DefWindowProc(handleWindow,message,wParam,lParam);
+    }
+    return 0;
+}
