@@ -1,16 +1,19 @@
 #include <Windows.h>
-#include <stdio.h>
 
 LRESULT CALLBACK WndProc(HWND handleWindow, UINT message, WPARAM wParam, LPARAM lParam);
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE previousInstance, LPWSTR lpCommandLine, int nCommandShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE previousInstance, LPWSTR lpCommandLine, int nCommandShow)
+{
     // cl windows.c user32.lib
+    MessageBoxExW(0,L"Test",L"Testing",MB_OK,0);
+    LPCWSTR menuName = L"Hi";
+    LPCWSTR className = L"Window";
     WNDCLASSEXW windowClass = {0};
-    windowClass.cbSize = sizeof(WNDCLASSEXW);
-    windowClass.style =  CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
+    windowClass.cbSize = sizeof(WNDCLASSEX);
+    windowClass.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
     windowClass.lpfnWndProc = WndProc;
     windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+    windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     windowClass.lpszMenuName = L"Hi";
     windowClass.lpszClassName = L"Window";
     windowClass.hIconSm = NULL;
@@ -18,44 +21,65 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE previousInstance, LPWSTR lpCo
     windowClass.hIcon = NULL;
     windowClass.cbClsExtra = 0;
     windowClass.cbWndExtra = 0;
-
+    RegisterClassExW(&windowClass);
     // HWND handleWindow = CreateWindowEXW(NULL, L"TEST",L"Window",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT, 0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
-    HWND handleWindow = CreateWindowW(L"TEST",L"Window",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
-    
+    // CreateWindowW(lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,lpParam) 
+    HWND handleWindow = CreateWindowW(L"Window",L"Hi",  WS_OVERLAPPEDWINDOW, 100, 100, 500, 500, NULL, NULL, hInstance, 0);
 
     ShowWindow(handleWindow, nCommandShow);
     UpdateWindow(handleWindow);
     MSG message = {0};
 
-    while(GetMessage(&message, NULL, 0, 0)){
+    while (GetMessageW(&message, NULL, 0, 0))
+    {
         TranslateMessage(&message);
         DispatchMessage(&message);
     }
 
     return 0;
 }
-LRESULT CALLBACK WndProc(HWND handleWindow, UINT message, WPARAM wParam, LPARAM lParam){
-    switch(message){
-        case WM_COMMAND:
-            {
-                printf("ACTIVE APP");
-            }
-            break;
-        case WM_PAINT:
-            {
-                PAINTSTRUCT paintStruct = {0};
-                HDC handleDCBeginPaint = BeginPaint(handleWindow,&paintStruct);
-                EndPaint(handleWindow, &paintStruct);
-                // return 0;
-            }
-            break;
-        case WM_DESTROY:
-            {
-                PostQuitMessage(0);
-            }
-            break;
-        default:
-            return DefWindowProc(handleWindow,message,wParam,lParam);
+LRESULT CALLBACK WndProc(HWND handleWindow, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = 0;
+    switch (message)
+    {
+    case WM_COMMAND:
+    {
+        OutputDebugString("WM_COMMAND\n");
+        result = 0;
     }
-    return 0;
+    break;
+    case WM_ACTIVATEAPP:
+    {
+        OutputDebugString("WM_ACTIVATEAPP");
+        result = 0;
+    }
+    break;
+    case WM_PAINT:
+    {
+        PAINTSTRUCT paintStruct = {0};
+        RECT rectangle = {0};
+        HDC handleDCBeginPaint = BeginPaint(handleWindow, &paintStruct);
+        GetClientRect(handleWindow, &rectangle);
+        // FillRect(handleDCBeginPaint,&rectangle,0x00A12345);
+        EndPaint(handleWindow, &paintStruct);
+        result = 0;
+    }
+    break;
+    case WM_DESTROY:
+    {
+        result = 0;
+        PostQuitMessage(0);
+    }
+    break;
+    case WM_CLOSE:
+    {
+        result = 0;
+        PostQuitMessage(0);
+    }
+    break;
+    default:
+        result = DefWindowProc(handleWindow, message, wParam, lParam);
+    }
+    return result;
 }
