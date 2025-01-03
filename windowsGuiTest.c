@@ -87,35 +87,8 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
             break;
         case WM_DRAWITEM:
             {
-                switch(LOWORD(w_param)){
-                    case 101:
-                        {
-                            // RECT rectangle = {0};
-                            // HWND button_window = FindWindowExW(handle_window, NULL, L"BUTTON", L"Click");
-                            // GetClientRect(button_window,&rectangle);
-                            // HDC button_hdc = GetDC(button_window);
-                            // FillRect(button_hdc, &rectangle, CreateSolidBrush(RGB(252,120,31))); 
-                            // // SetBkColor(button_hdc, RGB(0,0,0));
-                            // SetBkMode(button_hdc, TRANSPARENT);
-                            // DrawTextExW(button_hdc,L"Test",5,&rectangle,DT_CENTER | DT_VCENTER | DT_SINGLELINE,NULL);
-                            AddButtonStyles(handle_window, L"Click", L"Click Here", 11, RGB(252,120,31));
-                        }
-                        break;
-                    case 102:
-                        {
-                            // RECT rectangle = {0};
-                            // HWND button_window = FindWindowExW(handle_window, NULL, L"BUTTON", L"Other");
-                            // GetClientRect(button_window,&rectangle);
-                            // HDC button_hdc = GetDC(button_window);
-                            // FillRect(button_hdc, &rectangle, CreateSolidBrush(RGB(121,220,31))); 
-                            // // SetBkColor(button_hdc, RGB(0,0,0));
-                            // SetBkMode(button_hdc, TRANSPARENT);
-                            // DrawTextExW(button_hdc,L"Testing Window",15,&rectangle,DT_CENTER | DT_VCENTER | DT_SINGLELINE,NULL);
-                            AddButtonStyles(handle_window, L"Other", L"Testing Window", 15, RGB(121,220,31));
-                            
-                        }
-                        break;
-                } 
+                AddButtonStyles(handle_window, L"Click", L"Click Here", 11, RGB(252,120,31));
+                AddButtonStyles(handle_window, L"Other", L"Testing Window", 15, RGB(121,220,31)); 
             }
             break;
         
@@ -125,7 +98,12 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 switch(LOWORD(w_param)){
                     case 101:
                         {
-                            SendMessage(handle_window, WM_CLOSE, 0,0);
+                            SendMessageW(handle_window, WM_CLOSE, w_param,l_param);
+                        }
+                        break;
+                    case 102:
+                        {
+                            SendMessageW(handle_window, WM_CLOSE, w_param,l_param);
                         }
                         break;
                 }
