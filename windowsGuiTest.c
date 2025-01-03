@@ -2,7 +2,7 @@
 
 LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LPARAM l_param);
 unsigned short InitialiseWindow(HINSTANCE *handle_instance);
-HBRUSH CreateAssignBrush(COLORREF colour, LPDRAWITEMSTRUCT item);
+void AddButtonStyles(HWND handle_window, LPCWSTR window_name, LPWSTR text, int length_of_text, COLORREF colour);
 
 int WINAPI wWinMain(HINSTANCE handle_instance, HINSTANCE previousInstance, LPWSTR lpCommandLine, int n_command_show)
 {
@@ -59,7 +59,8 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 // HBRUSH brush = CreateSolidBrush(RGB(252,120,31));
                 // SelectObject(button_handle, brush);
                 
-                HWND button_window = CreateWindowExW(0L, L"BUTTON", L"Click", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 10, 10, 100, 100, handle_window, (HMENU)101, 0, NULL);
+                CreateWindowExW(0L, L"BUTTON", L"Click", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 10, 10, 100, 100, handle_window, (HMENU)101, 0, NULL);
+                CreateWindowExW(0L, L"BUTTON", L"Other", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 150, 10, 250, 100, handle_window, (HMENU)102, 0, NULL);
                 
             }
             break;
@@ -86,14 +87,32 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
             break;
         case WM_DRAWITEM:
             {
-                RECT rectangle = {0};
-                HWND button_window = FindWindowExW(handle_window,NULL,L"BUTTON",NULL);
                 switch(LOWORD(w_param)){
                     case 101:
                         {
-                            GetClientRect(button_window,&rectangle);
-                            HDC button_hdc = GetDC(button_window);
-                            FillRect(button_hdc, &rectangle, CreateSolidBrush(RGB(252,120,31))); 
+                            // RECT rectangle = {0};
+                            // HWND button_window = FindWindowExW(handle_window, NULL, L"BUTTON", L"Click");
+                            // GetClientRect(button_window,&rectangle);
+                            // HDC button_hdc = GetDC(button_window);
+                            // FillRect(button_hdc, &rectangle, CreateSolidBrush(RGB(252,120,31))); 
+                            // // SetBkColor(button_hdc, RGB(0,0,0));
+                            // SetBkMode(button_hdc, TRANSPARENT);
+                            // DrawTextExW(button_hdc,L"Test",5,&rectangle,DT_CENTER | DT_VCENTER | DT_SINGLELINE,NULL);
+                            AddButtonStyles(handle_window, L"Click", L"Click Here", 11, RGB(252,120,31));
+                        }
+                        break;
+                    case 102:
+                        {
+                            // RECT rectangle = {0};
+                            // HWND button_window = FindWindowExW(handle_window, NULL, L"BUTTON", L"Other");
+                            // GetClientRect(button_window,&rectangle);
+                            // HDC button_hdc = GetDC(button_window);
+                            // FillRect(button_hdc, &rectangle, CreateSolidBrush(RGB(121,220,31))); 
+                            // // SetBkColor(button_hdc, RGB(0,0,0));
+                            // SetBkMode(button_hdc, TRANSPARENT);
+                            // DrawTextExW(button_hdc,L"Testing Window",15,&rectangle,DT_CENTER | DT_VCENTER | DT_SINGLELINE,NULL);
+                            AddButtonStyles(handle_window, L"Other", L"Testing Window", 15, RGB(121,220,31));
+                            
                         }
                         break;
                 } 
@@ -108,6 +127,7 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                         {
                             SendMessage(handle_window, WM_CLOSE, 0,0);
                         }
+                        break;
                 }
                 result = 0;
             }
@@ -130,15 +150,15 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
     return result;
 }
 
-HBRUSH CreateAssignBrush(COLORREF colour, LPDRAWITEMSTRUCT item) {
-    HDC create_compatible_dc = CreateCompatibleDC(item->hDC);
-    RECT button = {0};
-    button.bottom = item->rcItem.bottom;
-    button.left = item->rcItem.left;
-    button.top = item->rcItem.top;
-    button.right = item->rcItem.right;
-    HBRUSH brush = CreateSolidBrush(colour);
-    FillRect(create_compatible_dc, &button, brush);
-    DeleteObject(create_compatible_dc);
-    return brush;
+void AddButtonStyles(HWND handle_window, LPCWSTR window_name, LPWSTR text, int length_of_text, COLORREF colour) {
+    RECT rectangle = {0};
+    HWND button_window = FindWindowExW(handle_window, NULL, L"BUTTON", window_name);
+    GetClientRect(button_window,&rectangle);
+    HDC button_hdc = GetDC(button_window);
+    FillRect(button_hdc, &rectangle, CreateSolidBrush(colour)); 
+    // SetBkColor(button_hdc, RGB(0,0,0));
+    SetBkMode(button_hdc, TRANSPARENT);
+    DrawTextExW(button_hdc,text,length_of_text,&rectangle,DT_CENTER | DT_VCENTER | DT_SINGLELINE,NULL);
+    DeleteObject(button_hdc);
+    DeleteObject(button_window);
 }
