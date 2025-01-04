@@ -62,6 +62,7 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 
                 CreateWindowExW(0L, L"BUTTON", L"Click", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 10, 10, 100, 100, handle_window, (HMENU)101, 0, NULL);
                 CreateWindowExW(0L, L"BUTTON", L"Other", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 150, 10, 250, 100, handle_window, (HMENU)102, 0, NULL);
+                CreateWindowExW(0L, L"EDIT", L"Edit Text", WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 150, 250, 100, handle_window, (HMENU)103, 0, NULL);
                 
             }
             break;
