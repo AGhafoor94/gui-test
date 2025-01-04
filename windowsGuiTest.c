@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <commdlg.h>
 
 LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LPARAM l_param);
 unsigned short InitialiseWindow(HINSTANCE *handle_instance);
@@ -6,7 +7,7 @@ void AddButtonStyles(HWND handle_window, LPCWSTR window_name, LPWSTR text, int l
 
 int WINAPI wWinMain(HINSTANCE handle_instance, HINSTANCE previousInstance, LPWSTR lpCommandLine, int n_command_show)
 {
-    // cl windows.c user32.lib kernel32.lib gdi32.lib
+    // cl windowsGuiTest.c user32.lib kernel32.lib gdi32.lib comdlg32.lib
     // MessageBoxExW(0, L"Test\n", L"Testing\n", MB_OK, 0);
     unsigned short register_class = InitialiseWindow(&handle_instance);
     if(register_class == 0){
@@ -87,13 +88,37 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
             break;
         case WM_DRAWITEM:
             {
-                AddButtonStyles(handle_window, L"Click", L"Click Here", 11, RGB(252,120,31));
-                AddButtonStyles(handle_window, L"Other", L"Testing Window", 15, RGB(121,220,31)); 
+                AddButtonStyles(handle_window, L"Click", L"Close", 6, RGB(252,120,31));
+                AddButtonStyles(handle_window, L"Other", L"Open File Explorer", 15, RGB(121,220,31)); 
             }
             break;
         
         case WM_COMMAND:
             {
+                LPTSTR file_location = {0};
+                LPTSTR file_title = {0};
+                OPENFILENAMEW open_file_name = {0};
+                open_file_name.lStructSize = sizeof(OPENFILENAMEW);
+                open_file_name.hwndOwner = handle_window;
+                open_file_name.hInstance = NULL;
+                open_file_name.lpstrFilter = L"All Files\0*.*\0\0";
+                open_file_name.lpstrCustomFilter = NULL;
+                open_file_name.nMaxCustFilter = NULL;
+                open_file_name.nFilterIndex = NULL;
+                open_file_name.lpstrFile = &file_location;
+                open_file_name.nMaxFile = (DWORD)256;
+                open_file_name.lpstrFileTitle = &file_title;
+                open_file_name.nMaxFileTitle = sizeof(&file_title);
+                open_file_name.lpstrInitialDir = L"C:\\Users\\";
+                open_file_name.lpstrTitle = L"Weird";
+                open_file_name.Flags = OFN_EXPLORER;
+                open_file_name.nFileOffset = 0;
+                open_file_name.nFileExtension = 0;
+                open_file_name.lpstrDefExt = NULL;
+                open_file_name.lCustData = l_param;
+                open_file_name.lpfnHook = NULL;
+                open_file_name.lpTemplateName = NULL;
+
                 OutputDebugString("WM_COMMAND\n");
                 switch(LOWORD(w_param)){
                     case 101:
@@ -103,7 +128,7 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                         break;
                     case 102:
                         {
-                            SendMessageW(handle_window, WM_CLOSE, w_param,l_param);
+                            GetOpenFileNameW(&open_file_name);
                         }
                         break;
                 }
