@@ -89,26 +89,26 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
         case WM_DRAWITEM:
             {
                 AddButtonStyles(handle_window, L"Click", L"Close", 6, RGB(252,120,31));
-                AddButtonStyles(handle_window, L"Other", L"Open File Explorer", 15, RGB(121,220,31)); 
+                AddButtonStyles(handle_window, L"Other", L"Open File Explorer", 19, RGB(121,220,31)); 
             }
             break;
         
         case WM_COMMAND:
             {
-                LPTSTR file_location = {0};
-                LPTSTR file_title = {0};
+                LPWSTR file_location = {0};
+                LPWSTR file_title = {0};
                 OPENFILENAMEW open_file_name = {0};
-                open_file_name.lStructSize = sizeof(OPENFILENAMEW);
                 open_file_name.hwndOwner = handle_window;
                 open_file_name.hInstance = NULL;
-                open_file_name.lpstrFilter = L"All Files\0*.*\0\0";
+                // open_file_name.lpstrFilter = L"All Files\0*.*\0\0";
+                open_file_name.lpstrFilter = L"All Files (*.*)\0*.*\0";
                 open_file_name.lpstrCustomFilter = NULL;
-                open_file_name.nMaxCustFilter = NULL;
-                open_file_name.nFilterIndex = NULL;
-                open_file_name.lpstrFile = &file_location;
-                open_file_name.nMaxFile = (DWORD)256;
-                open_file_name.lpstrFileTitle = &file_title;
-                open_file_name.nMaxFileTitle = sizeof(&file_title);
+                open_file_name.nMaxCustFilter = 0;
+                open_file_name.nFilterIndex = 0;
+                open_file_name.lpstrFile = file_location;
+                open_file_name.nMaxFile = 255;
+                open_file_name.lpstrFileTitle = file_title;
+                open_file_name.nMaxFileTitle = 255;
                 open_file_name.lpstrInitialDir = L"C:\\Users\\";
                 open_file_name.lpstrTitle = L"Weird";
                 open_file_name.Flags = OFN_EXPLORER;
@@ -118,8 +118,8 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 open_file_name.lCustData = l_param;
                 open_file_name.lpfnHook = NULL;
                 open_file_name.lpTemplateName = NULL;
+                open_file_name.lStructSize = sizeof(open_file_name);
 
-                OutputDebugString("WM_COMMAND\n");
                 switch(LOWORD(w_param)){
                     case 101:
                         {
@@ -128,10 +128,13 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                         break;
                     case 102:
                         {
-                            GetOpenFileNameW(&open_file_name);
+                            if(GetOpenFileNameW(&open_file_name)){
+                                MessageBoxExW(handle_window,L"Test",L"Test",MB_OKCANCEL,0);
+                            }
                         }
                         break;
                 }
+
                 result = 0;
             }
             break;
@@ -159,9 +162,8 @@ void AddButtonStyles(HWND handle_window, LPCWSTR window_name, LPWSTR text, int l
     GetClientRect(button_window,&rectangle);
     HDC button_hdc = GetDC(button_window);
     FillRect(button_hdc, &rectangle, CreateSolidBrush(colour)); 
-    // SetBkColor(button_hdc, RGB(0,0,0));
     SetBkMode(button_hdc, TRANSPARENT);
-    DrawTextExW(button_hdc,text,length_of_text,&rectangle,DT_CENTER | DT_VCENTER | DT_SINGLELINE,NULL);
+    DrawTextExW(button_hdc,text, length_of_text, &rectangle, DT_CENTER | DT_VCENTER | DT_SINGLELINE, NULL);
     DeleteObject(button_hdc);
     DeleteObject(button_window);
 }
