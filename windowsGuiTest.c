@@ -1,6 +1,10 @@
 #include <Windows.h>
 #include <commdlg.h>
 
+#define WINDOW_WIDTH 1200
+#define WINDOW_HEIGHT 800
+static unsigned short message_text = {0};
+
 LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LPARAM l_param);
 unsigned short InitialiseWindow(HINSTANCE *handle_instance);
 void AddButtonStyles(HWND handle_window, LPCWSTR window_name, LPWSTR text, int length_of_text, COLORREF colour);
@@ -16,7 +20,7 @@ int WINAPI wWinMain(HINSTANCE handle_instance, HINSTANCE previousInstance, LPWST
     // CreateWindowW(lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,lpParam)
     // HWND handleWindow = CreateWindowW(L"Window\0", L"Hi\0", WS_OVERLAPPEDWINDOW, 100, 100, 500, 500, NULL, NULL, handleInstance, 0);
     
-    HWND handle_window = CreateWindowExW(0L, L"Window", L"Hello", (0x00000000L | 0x00C00000L | 0x00080000L | 0x00040000L | 0x00020000L | 0x00010000L), 100, 100,500, 500, NULL, NULL, handle_instance, 0);
+    HWND handle_window = CreateWindowExW(0L, L"Window", L"Hello", (0x00000000L | 0x00C00000L | 0x00080000L | 0x00040000L | 0x00020000L | 0x00010000L), 100, 100,WINDOW_WIDTH, WINDOW_HEIGHT, NULL, NULL, handle_instance, 0);
     // HWND button_window = CreateWindowExW(0L, L"BUTTON", L"Click", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 10, 10, 100, 100, handle_window, (HMENU)101, 0, NULL);
     ShowWindow(handle_window, n_command_show); 
     UpdateWindow(handle_window);
@@ -62,8 +66,9 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 
                 CreateWindowExW(0L, L"BUTTON", L"Click", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 10, 10, 100, 100, handle_window, (HMENU)101, 0, NULL);
                 CreateWindowExW(0L, L"BUTTON", L"Other", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 150, 10, 250, 100, handle_window, (HMENU)102, 0, NULL);
-                CreateWindowExW(0L, L"EDIT", L"Edit Text", WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 150, 250, 100, handle_window, (HMENU)103, 0, NULL);
-                
+                CreateWindowExW(0L, L"EDIT", &message_text, WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 150, 250, 100, handle_window, (HMENU)103, 0, NULL);
+                // CreateWindowExW(0L, L"STATIC", &message_text, WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 250, 250, 100, handle_window, (HMENU)104, 0, NULL);
+                UpdateWindow(handle_window);
             }
             break;
         case WM_ACTIVATEAPP:
@@ -124,7 +129,11 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 switch(LOWORD(w_param)){
                     case 101:
                         {
-                            SendMessageW(handle_window, WM_CLOSE, w_param,l_param);
+                            MessageBoxExW(handle_window,&message_text,L"Test",MB_OKCANCEL,0);
+                            // SendMessageW(handle_window, WM_CLOSE, w_param,l_param);
+                            
+                            UpdateWindow(handle_window);
+
                         }
                         break;
                     case 102:
@@ -136,9 +145,15 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                         break;
                 }
 
-                result = 0;
             }
             break;
+        // case WM_LBUTTONDOWN:
+        //     {
+        //         if(LOWORD(w_param) == 101){
+        //             AddButtonStyles(handle_window, L"Click", L"Close", 6, RGB(106,34,116));
+        //         }
+        //     }
+        //     break;
         case WM_DESTROY:
         {
             result = 0;
