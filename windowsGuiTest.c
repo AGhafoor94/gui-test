@@ -67,7 +67,7 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 CreateWindowExW(0L, L"BUTTON", L"Click", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 10, 10, 100, 100, handle_window, (HMENU)101, 0, NULL);
                 CreateWindowExW(0L, L"BUTTON", L"Other", WS_TABSTOP | WS_VISIBLE| WS_CHILD| BS_DEFPUSHBUTTON | BS_OWNERDRAW, 150, 10, 250, 100, handle_window, (HMENU)102, 0, NULL);
                 CreateWindowExW(0L, L"EDIT", &message_text, WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 150, 250, 100, handle_window, (HMENU)103, 0, NULL);
-                // CreateWindowExW(0L, L"STATIC", &message_text, WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 250, 250, 100, handle_window, (HMENU)104, 0, NULL);
+                CreateWindowExW(0L, L"STATIC", &message_text, WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 250, 250, 100, handle_window, (HMENU)104, 0, NULL);
                 UpdateWindow(handle_window);
             }
             break;
@@ -87,6 +87,15 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                 RECT rectangle = {0};
                 HDC handle_window_hdc = BeginPaint(handle_window, &paint_struct);
                 GetClientRect(handle_window, &rectangle);
+                RECT left_rectangle = {0};
+                left_rectangle.left = 0;
+                left_rectangle.bottom = WINDOW_HEIGHT;
+                left_rectangle.top = 0;
+                left_rectangle.right = 50;
+
+                FillRect(handle_window_hdc, &left_rectangle,CreateSolidBrush(RGB(0,0,0)));
+                Rectangle(handle_window_hdc,0,0,50,100);
+                
                 FillRect(handle_window_hdc,&rectangle,CreateSolidBrush(RGB(245,245,245)));
                 EndPaint(handle_window, &paint_struct);
                 result = 0;
@@ -101,31 +110,39 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
         
         case WM_COMMAND:
             {
-                LPWSTR file_location = {0};
-                LPWSTR file_title = {0};
+                WCHAR file_buffer[MAX_PATH];
+                // LPWSTR file_location = {0};
+                // LPWSTR file_title = {0};
                 OPENFILENAMEW open_file_name = {0};
                 open_file_name.hwndOwner = handle_window;
                 open_file_name.hInstance = NULL;
+                open_file_name.lStructSize = sizeof(open_file_name);
                 // open_file_name.lpstrFilter = L"All Files\0*.*\0\0";
                 open_file_name.lpstrFilter = L"All Files (*.*)\0*.*\0";
                 open_file_name.lpstrCustomFilter = NULL;
                 open_file_name.nMaxCustFilter = 0;
                 open_file_name.nFilterIndex = 0;
-                open_file_name.lpstrFile = file_location;
-                open_file_name.nMaxFile = 255;
-                open_file_name.lpstrFileTitle = file_title;
+                open_file_name.lpstrFile = file_buffer;
+                open_file_name.lpstrFile[0] = '\0';
+                open_file_name.nMaxFile = sizeof(file_buffer);
+                // open_file_name.lpstrFileTitle = file_title;
+                open_file_name.lpstrFileTitle = NULL;
                 open_file_name.nMaxFileTitle = 255;
                 open_file_name.lpstrInitialDir = L"C:\\Users\\";
                 open_file_name.lpstrTitle = L"Weird";
-                open_file_name.Flags = OFN_EXPLORER;
+                open_file_name.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
                 open_file_name.nFileOffset = 0;
                 open_file_name.nFileExtension = 0;
                 open_file_name.lpstrDefExt = NULL;
                 open_file_name.lCustData = l_param;
                 open_file_name.lpfnHook = NULL;
                 open_file_name.lpTemplateName = NULL;
-                open_file_name.lStructSize = sizeof(open_file_name);
-
+                if(GetOpenFileNameW(&open_file_name)){
+                    printf("File name: %s",open_file_name.lpstrFile);
+                    MessageBoxExW(handle_window,open_file_name.lpstrFile,L"Test",MB_OKCANCEL,0);
+                    // CreateWindowExW(0L, L"STATIC", open_file_name.lpstrFile, WS_TABSTOP | WS_VISIBLE| WS_CHILD| ES_LEFT, 10, 450, 250, 100, handle_window, (HMENU)104, 0, NULL);
+                    // UpdateWindow(handle_window);
+                }
                 switch(LOWORD(w_param)){
                     case 101:
                         {
@@ -134,13 +151,6 @@ LRESULT CALLBACK MainWindow(HWND handle_window, UINT message, WPARAM w_param, LP
                             
                             UpdateWindow(handle_window);
 
-                        }
-                        break;
-                    case 102:
-                        {
-                            if(GetOpenFileNameW(&open_file_name)){
-                                MessageBoxExW(handle_window,L"Test",L"Test",MB_OKCANCEL,0);
-                            }
                         }
                         break;
                 }
